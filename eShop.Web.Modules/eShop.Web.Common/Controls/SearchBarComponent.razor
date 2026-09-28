@@ -1,0 +1,21 @@
+<form class="d-flex align-items-center mb-3" @onsubmit="HandleSearch">
+    <div class="me-2">
+        <label for="filter" class="col-form-label">Search:</label>
+    </div>
+    <div class="me-2">
+        <input type="text" class="form-control" id="filter" @bind="filter" placeholder="Type to search..." />
+    </div>
+    <button type="button" class="btn btn-primary" @onclick="HandleSearch">Search</button>
+</form>
+
+@code {
+    private string filter = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    private async Task HandleSearch()
+    {
+        await OnSearch.InvokeAsync(filter);
+    }
+}

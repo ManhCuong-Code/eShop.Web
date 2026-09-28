@@ -1,0 +1,53 @@
+@page "/cart"
+@rendermode InteractiveServer
+
+@using eShop.UseCases.ShoppingCartScreen.Interfaces
+
+@inject IViewShoppingCartUseCase viewShoppingCartUseCase
+
+<h3>Shopping Cart</h3>
+<br />
+
+@if (order != null && order.LineItems != null && order.LineItems.Count > 0)
+{
+    <div class="row">
+        <div class="col-6">
+            <ul>
+                @for (int i = 0; i < order.LineItems.Count; i++)
+                {
+                    <LineItemComponent LineItem="order.LineItems[i]"></LineItemComponent>
+
+                    @if (i < order.LineItems.Count - 1)
+                    {
+                        <li style="list-style:none">
+                            <hr />
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+        <div class="col">
+            @*order summary*@
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-light border text-muted">
+        Your cart is empty.
+    </div>
+}
+
+@code {
+    private Order? order;
+
+    //javasript interopt
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            order = await viewShoppingCartUseCase.Execute();
+            StateHasChanged();
+        }
+    }
+}

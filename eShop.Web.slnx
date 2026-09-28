@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/eShop.Web.Modules/">
+    <Project Path="eShop.Web.Modules/eShop.Web.AdminPortal/eShop.Web.AdminPortal.csproj" Id="d3445dab-20cc-4089-bca4-dd5f52498eca" />
+    <Project Path="eShop.Web.Modules/eShop.Web.Common/eShop.Web.Common.csproj" Id="2875f293-a0b4-4fb9-a0fd-c1a2503a4a1d" />
+    <Project Path="eShop.Web.Modules/eShop.Web.CustomerPortal/eShop.Web.CustomerPortal.csproj" Id="b4333f71-66e3-415e-a99c-18977b96c225" />
+  </Folder>
+  <Folder Name="/Plugins/">
+    <Project Path="Plugins/eShop.DataStore.HandCoded/eShop.DataStore.HandCoded.csproj" />
+    <Project Path="Plugins/eShop.ShoppingCart.LocalStorage/eShop.ShoppingCart.LocalStorage.csproj" Id="b6f90c05-a01e-4409-a0ea-1772e9ddd36d" />
+  </Folder>
+  <Project Path="eShop.CoreBusiness/eShop.CoreBusiness.csproj" />
+  <Project Path="eShop.UseCases/eShop.UseCases.csproj" />
+  <Project Path="eShop.Web/eShop.Web.csproj" />
+</Solution>

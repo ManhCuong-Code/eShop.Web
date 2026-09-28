@@ -1,0 +1,71 @@
+@page "/products/{id:int}"
+@page "/product/{id:int}"
+@rendermode InteractiveServer
+
+@inject NavigationManager navigationManager
+
+@inject IViewProductUseCase viewProduct
+@inject IAddProductToCartUseCase addProductToCartUseCase
+
+<div class="container my-3">
+    <div class="mb-3">
+        <NavLink href="/products" class="btn btn-outline-secondary btn-sm">
+            &larr; Back to Products
+        </NavLink>
+    </div>
+
+    @if (product != null)
+    {
+        <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="row g-0">
+                <div class="col-md-5 d-flex align-items-center justify-content-center bg-light p-4">
+                    <img src="@product.ImageLink" alt="@product.Name" class="img-fluid rounded shadow-sm" style="max-height: 350px; object-fit: contain;" />
+                </div>
+                <div class="col-md-7">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge bg-primary text-uppercase">@product.Brand</span>
+                            <span class="badge bg-light text-secondary border">#@product.productId</span>
+                        </div>
+                        <h3 class="card-title fw-bold mb-3 text-dark">@product.Name</h3>
+                        <h4 class="text-success fw-bold mb-3">@product.Price.ToString("C")</h4>
+                        <hr />
+                        <h6 class="text-secondary fw-semibold">Description</h6>
+                        <p class="card-text text-muted" style="line-height: 1.6;">@product.Description</p>
+                    </div>
+                </div>
+            </div>
+            <button class ="btn btn-primary" @onclick ="AddToCart">Add to Cart</button>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning shadow-sm" role="alert">
+            Cannot find product details or product does not exist.
+        </div>
+    }
+</div>
+
+@code {
+    private Product? product;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Id > 0)
+        {
+            product = viewProduct.Execute(Id);
+        }
+    }
+    private void AddToCart()
+    {
+        if (product != null)
+        {
+            addProductToCartUseCase.Execute(product.productId);
+            navigationManager.NavigateTo("/");
+        }
+    }
+}
