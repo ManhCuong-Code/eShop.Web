@@ -9,10 +9,15 @@
 
 ---
 
-## 👨‍💻 Thông Tin Sinh Viên Thực Hiện
+## 👨‍💻 Thông Tin Sinh Viên & Môn Học
 
+* **Môn học:** Lập trình ứng dụng Web
 * **Họ và tên:** Trần Viết Mạnh Cường
 * **Mã sinh viên (MSSV):** 23K4080003
+* **Lớp:** K57 (Tin học KT)
+* **Khóa:** Khóa 57
+* **Ngành:** Tin học kinh tế
+* **Trạng thái:** Đang học
 * **GitHub Repository:** [https://github.com/ManhCuong-Code/eShop.Web](https://github.com/ManhCuong-Code/eShop.Web)
 
 ---
@@ -150,6 +155,6 @@ dotnet run --project "eShop/eShop.Web/eShop.Web.csproj"
 
 ## 📜 Giấy Phép & Bản Quyền
 
-Dự án được xây dựng và phát triển phục vụ mục đích học tập và nghiên cứu công nghệ phát triển ứng dụng web hiện đại với .NET Core và Blazor.
+Dự án được xây dựng và phát triển phục vụ mục đích học tập và nghiên cứu công nghệ phát triển ứng dụng web hiện đại với .NET Core và Blazor trong môn học **Lập trình ứng dụng Web**.
 
-&copy; 2026 **Trần Viết Mạnh Cường (MSSV: 23K4080003)**. All rights reserved.
+&copy; 2026 **Trần Viết Mạnh Cường (MSSV: 23K4080003 - K57 Tin học KT)**. All rights reserved.
