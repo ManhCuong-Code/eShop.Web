@@ -1,0 +1,267 @@
+@page "/orderconfirm/{UniqueId}"
+@rendermode InteractiveServer
+
+@using eShop.CoreBusiness.Models
+@using eShop.UseCases.OrderConfirmationScreen
+@using Microsoft.JSInterop
+@inject IOrderConfirmationUseCase orderConfirmationUseCase
+@inject IJSRuntime jsRuntime
+
+<PageTitle>Xác Nhận Đơn Hàng - eShop</PageTitle>
+
+<div class="container my-4">
+    <!-- Stepper Navigation -->
+    <div class="checkout-steps">
+        <a href="/cart" class="step-item completed text-decoration-none">
+            <span class="step-num"><i class="bi bi-check-lg"></i></span>
+            <span>1. Giỏ hàng</span>
+        </a>
+        <div class="step-divider" style="background-color: #10b981;"></div>
+        <div class="step-item completed">
+            <span class="step-num"><i class="bi bi-check-lg"></i></span>
+            <span>2. Thông tin giao hàng</span>
+        </div>
+        <div class="step-divider" style="background-color: #10b981;"></div>
+        <div class="step-item completed active">
+            <span class="step-num"><i class="bi bi-check-lg"></i></span>
+            <span>3. Hoàn tất đơn hàng</span>
+        </div>
+    </div>
+
+    @if (order != null)
+    {
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-5 mx-auto" style="max-width: 960px;">
+            <!-- Header Banner -->
+            <div class="card-header bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                <div class="mb-3">
+                    <span class="bg-white bg-opacity-25 p-3 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 72px; height: 72px;">
+                        <i class="bi bi-check2-circle display-5 text-white"></i>
+                    </span>
+                </div>
+                <h2 class="fw-bold mb-2">Đặt Hàng Thành Công!</h2>
+                <p class="mb-0 text-white-70 fs-6">
+                    Cảm ơn bạn đã tin tưởng mua sắm tại <strong>eShop</strong>. Đơn hàng của bạn đã được ghi nhận vào hệ thống.
+                </p>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <!-- Order Unique Code Box -->
+                <div class="p-3 bg-light rounded-4 border border-success-subtle text-center mb-4">
+                    <span class="text-secondary d-block small text-uppercase fw-semibold mb-1">Mã Tra Cứu Đơn Hàng Của Bạn</span>
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <strong class="fs-4 text-success font-monospace user-select-all">@order.UniqueId</strong>
+                        <button class="btn btn-outline-success btn-sm rounded-pill px-3 py-1 fw-semibold" @onclick="CopyOrderCode" title="Sao chép mã">
+                            @if (copied)
+                            {
+                                <i class="bi bi-check2 me-1"></i><span>Đã sao chép!</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-clipboard me-1"></i><span>Sao chép</span>
+                            }
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-1">Lưu lại mã này để tra cứu trạng thái giao hàng bất cứ lúc nào</small>
+                </div>
+
+                <!-- Order Processing Status Timeline -->
+                <div class="card border rounded-3 p-3 bg-light-subtle mb-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 text-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-success rounded-circle p-2"><i class="bi bi-check-lg"></i></span>
+                            <div class="text-start">
+                                <div class="fw-bold small text-success">Đã Đặt Hàng</div>
+                                <small class="text-muted">@(order.DatePlaced?.ToString("dd/MM HH:mm") ?? "Vừa xong")</small>
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted d-none d-md-block"></i>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark rounded-circle p-2"><i class="bi bi-box-seam"></i></span>
+                            <div class="text-start">
+                                <div class="fw-bold small text-warning text-dark">Chờ Xử Lý</div>
+                                <small class="text-muted">Kho đang chuẩn bị hàng</small>
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted d-none d-md-block"></i>
+                        <div class="d-flex align-items-center gap-2 opacity-50">
+                            <span class="badge bg-secondary rounded-circle p-2"><i class="bi bi-truck"></i></span>
+                            <div class="text-start">
+                                <div class="fw-bold small text-secondary">Đang Giao Hàng</div>
+                                <small class="text-muted">Dự kiến 2-3 ngày</small>
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted d-none d-md-block"></i>
+                        <div class="d-flex align-items-center gap-2 opacity-50">
+                            <span class="badge bg-secondary rounded-circle p-2"><i class="bi bi-house-check"></i></span>
+                            <div class="text-start">
+                                <div class="fw-bold small text-secondary">Đã Nhận Hàng</div>
+                                <small class="text-muted">Hoàn tất</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Info Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-4 bg-white border rounded-4 shadow-sm h-100">
+                            <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                                <i class="bi bi-person-vcard text-primary fs-5"></i>
+                                <h6 class="fw-bold mb-0 text-dark">Thông Tin Khách Hàng</h6>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-muted small d-block">Họ và tên người nhận:</span>
+                                <strong class="text-dark">@order.CustomerName</strong>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-muted small d-block">Địa chỉ giao nhận:</span>
+                                <span class="text-dark">@order.CustomerAddress</span>
+                            </div>
+                            <div>
+                                <span class="text-muted small d-block">Khu vực:</span>
+                                <span class="text-dark">@order.CustomerCity, @order.CustomerStateProvince, @order.CustomerCountry</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-4 bg-white border rounded-4 shadow-sm h-100">
+                            <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                                <i class="bi bi-file-earmark-text text-primary fs-5"></i>
+                                <h6 class="fw-bold mb-0 text-dark">Chi Tiết Đơn Hàng</h6>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Mã đơn hệ thống:</span>
+                                <span class="fw-bold text-dark">#@order.OrderID</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Thời gian đặt mua:</span>
+                                <span class="text-dark">@order.DatePlaced?.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Phương thức thanh toán:</span>
+                                <span class="badge bg-light text-dark border">COD - Khi nhận hàng</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted small">Trạng thái:</span>
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1">Chờ Xử Lý</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <div class="mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="fw-bold text-dark mb-0">
+                            <i class="bi bi-box2-heart text-primary me-2"></i>Danh Sách Sản Phẩm (@order.LineItemCount)
+                        </h6>
+                    </div>
+                    <div class="table-responsive rounded-4 border overflow-hidden">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3" style="min-width: 250px;">Sản Phẩm</th>
+                                    <th class="text-center" style="width: 100px;">Hình Ảnh</th>
+                                    <th class="text-center" style="width: 100px;">Số Lượng</th>
+                                    <th class="text-end" style="width: 130px;">Đơn Giá</th>
+                                    <th class="text-end pe-3" style="width: 140px;">Thành Tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (order.LineItems != null)
+                                {
+                                    @foreach (var item in order.LineItems)
+                                    {
+                                        <tr>
+                                            <td class="ps-3">
+                                                <div class="fw-semibold text-dark">@(item.Product?.Name ?? $"Sản phẩm #{item.ProductId}")</div>
+                                                <small class="text-muted">Mã SP: #@item.ProductId</small>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (!string.IsNullOrEmpty(item.Product?.ImageLink))
+                                                {
+                                                    <img src="@item.Product.ImageLink" alt="@item.Product.Name" 
+                                                         style="width: 48px; height: 48px; object-fit: contain; border-radius: 8px;" class="border p-1 bg-white" />
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-light text-dark border px-3 py-1 rounded-pill">@item.Quantity</span>
+                                            </td>
+                                            <td class="text-end text-muted">@item.Price.ToString("C")</td>
+                                            <td class="text-end pe-3 fw-bold text-dark">@((item.Price * item.Quantity).ToString("C"))</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="4" class="text-end text-secondary fw-semibold">Phí giao hàng:</td>
+                                    <td class="text-end pe-3 text-success fw-semibold">Miễn phí</td>
+                                </tr>
+                                <tr class="border-top-2">
+                                    <td colspan="4" class="text-end fs-5 fw-bold text-dark">Tổng Cộng Thanh Toán:</td>
+                                    <td class="text-end pe-3 fs-5 fw-bold text-danger">@order.TotalPrice.ToString("C")</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex flex-wrap align-items-center justify-content-center gap-3 pt-2">
+                    <a href="/products" class="btn btn-primary btn-lg px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-cart-plus"></i>
+                        <span>Tiếp Tục Mua Sắm</span>
+                    </a>
+                    <button class="btn btn-outline-secondary btn-lg px-4 fw-semibold d-inline-flex align-items-center gap-2" @onclick="PrintInvoice">
+                        <i class="bi bi-printer"></i>
+                        <span>In Hoá Đơn</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 my-5">
+            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Đang tải...</span>
+            </div>
+            <p class="lead text-muted">Đang tải thông tin xác nhận đơn hàng...</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? UniqueId { get; set; }
+
+    private Order? order;
+    private bool copied = false;
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(UniqueId))
+        {
+            order = orderConfirmationUseCase.Execute(UniqueId);
+        }
+    }
+
+    private async Task CopyOrderCode()
+    {
+        if (!string.IsNullOrEmpty(order?.UniqueId))
+        {
+            await jsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", order.UniqueId);
+            copied = true;
+            StateHasChanged();
+            await Task.Delay(2000);
+            copied = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task PrintInvoice()
+    {
+        await jsRuntime.InvokeVoidAsync("window.print");
+    }
+}

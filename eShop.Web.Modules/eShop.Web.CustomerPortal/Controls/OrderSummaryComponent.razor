@@ -1,6 +1,127 @@
-﻿
+@inject NavigationManager navigationManager
+
+<div class="card shadow-sm border-0 rounded-4 w-100 overflow-hidden">
+    <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+        <div class="d-flex align-items-center justify-content-between">
+            <h5 class="card-title fw-bold mb-0 text-dark">
+                <i class="bi bi-receipt-cutoff text-primary me-2"></i>Tóm Tắt Đơn Hàng
+            </h5>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1">
+                @itemsCount sản phẩm
+            </span>
+        </div>
+    </div>
+    
+    <div class="card-body px-4 pt-2 pb-4">
+        @if (Order?.LineItems != null && Order.LineItems.Count > 0 && HidePlaceOrderButton)
+        {
+            <div class="mb-3 border-bottom pb-3">
+                <div class="text-muted small fw-semibold text-uppercase mb-2">Danh sách sản phẩm</div>
+                <div class="d-flex flex-column gap-2" style="max-height: 220px; overflow-y: auto;">
+                    @foreach (var item in Order.LineItems)
+                    {
+                        <div class="d-flex align-items-center gap-3 p-2 rounded-3 bg-light-subtle border">
+                            @if (!string.IsNullOrEmpty(item.Product?.ImageLink))
+                            {
+                                <img src="@item.Product.ImageLink" alt="@item.Product.Name" 
+                                     style="width: 44px; height: 44px; object-fit: contain; border-radius: 8px; background: #fff;" class="border p-1" />
+                            }
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="fw-semibold text-truncate small" title="@item.Product?.Name">
+                                    @(item.Product?.Name ?? $"Sản phẩm #{item.ProductId}")
+                                </div>
+                                <div class="text-muted small d-flex justify-content-between">
+                                    <span>SL: @item.Quantity &times; @item.Price.ToString("C")</span>
+                                    <span class="fw-bold text-dark">@((item.Price * item.Quantity).ToString("C"))</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-secondary">Tạm tính tiền hàng:</span>
+            <span class="fw-semibold text-dark">@itemsTotalPrice.ToString("c")</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-secondary">Phí vận chuyển:</span>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Miễn phí</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-secondary">Thuế ước tính (VAT):</span>
+            <span class="text-muted">$0.00</span>
+        </div>
+
+        <hr class="border-secondary-subtle my-3" />
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <div class="fs-6 fw-bold text-dark">Tổng cộng thanh toán:</div>
+                <div class="text-muted small">(Đã bao gồm VAT nếu có)</div>
+            </div>
+            <div class="fs-4 fw-bolder text-danger">
+                @itemsTotalPrice.ToString("c")
+            </div>
+        </div>
+
+        @if (!HidePlaceOrderButton) 
+        {
+            <button class="btn btn-primary btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" 
+                    @onclick="PlaceOrder">
+                <span>Tiến Hành Đặt Hàng</span>
+                <i class="bi bi-arrow-right"></i>
+            </button>
+        }
+
+        <div class="mt-4 pt-3 border-top">
+            <div class="d-flex align-items-center gap-2 text-muted small mb-2">
+                <i class="bi bi-shield-check text-success fs-6"></i>
+                <span>Thanh toán an toàn & bảo mật tuyệt đối</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 text-muted small mb-2">
+                <i class="bi bi-truck text-primary fs-6"></i>
+                <span>Giao hàng tận nơi toàn quốc</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 text-muted small">
+                <i class="bi bi-arrow-repeat text-warning fs-6"></i>
+                <span>Đổi trả thuận tiện trong vòng 7 ngày</span>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
-    int itemCount = 0;
-    double itemToTa
+    private int itemsCount = 0;
+    private double itemsTotalPrice = 0;
+
+    [Parameter]
+    public Order? Order { get; set; }
+
+    [Parameter]
+    public bool HidePlaceOrderButton { get; set; } = false;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Order != null && Order.LineItems != null && Order.LineItems.Count > 0)
+        {
+            itemsCount = Order.LineItems.Sum(x => x.Quantity);
+            itemsTotalPrice = Order.LineItems.Sum(x => x.Price * x.Quantity);
+        }
+        else
+        {
+            itemsCount = 0;
+            itemsTotalPrice = 0;
+        }
+    }
+
+    private void PlaceOrder()
+    {
+        navigationManager.NavigateTo("/placeorder");
+    }
 }

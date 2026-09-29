@@ -1,0 +1,244 @@
+@page "/placeorder"
+@rendermode InteractiveServer
+
+@inject IViewShoppingCartUseCase viewShoppingCartUseCase
+@inject IPlaceOrderUseCase placeOrderUseCase
+@inject NavigationManager navigationManager
+
+<PageTitle>Thanh Toán Đơn Hàng - eShop</PageTitle>
+
+<div class="container my-4">
+    <!-- Stepper Navigation -->
+    <div class="checkout-steps">
+        <a href="/cart" class="step-item completed text-decoration-none">
+            <span class="step-num"><i class="bi bi-check-lg"></i></span>
+            <span>1. Giỏ hàng</span>
+        </a>
+        <div class="step-divider"></div>
+        <div class="step-item active">
+            <span class="step-num">2</span>
+            <span>2. Thông tin giao hàng</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <span class="step-num">3</span>
+            <span>3. Hoàn tất</span>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5 my-5">
+            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Đang tải...</span>
+            </div>
+            <p class="text-muted fw-semibold">Đang chuẩn bị thông tin đơn hàng...</p>
+        </div>
+    }
+    else if (order == null || order.LineItems == null || order.LineItems.Count == 0)
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4 mx-auto" style="max-width: 520px;">
+            <div class="mb-3">
+                <i class="bi bi-cart-x text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">Giỏ hàng của bạn đang trống</h4>
+            <p class="text-muted mb-4">Hiện không có sản phẩm nào để thanh toán. Hãy chọn những món đồ yêu thích nhé!</p>
+            <div>
+                <a href="/products" class="btn btn-primary px-4 py-2 fw-semibold">
+                    <i class="bi bi-arrow-left me-2"></i>Khám Phá Sản Phẩm
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <!-- Left Column: Customer and Shipping Information -->
+            <div class="col-lg-7">
+                <div class="card p-4 p-md-4 shadow-sm border-0 rounded-4 bg-white mb-4">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <div class="bg-primary-subtle text-primary p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="bi bi-geo-alt-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">Thông Tin Người Nhận & Địa Chỉ Giao Hàng</h5>
+                            <small class="text-muted">Đơn hàng sẽ được giao trực tiếp đến địa chỉ bên dưới</small>
+                        </div>
+                    </div>
+
+                    @if (isError)
+                    {
+                        <div class="alert alert-danger d-flex align-items-center border-0 shadow-sm rounded-3 mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill fs-5 me-2 flex-shrink-0"></i>
+                            <div>
+                                Vui lòng điền đầy đủ <strong>Họ tên</strong> và <strong>Địa chỉ nhận hàng</strong> trước khi tiếp tục!
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase">
+                            Họ và tên người nhận <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                            <input type="text" 
+                                   class="form-control @(isError && string.IsNullOrWhiteSpace(order.CustomerName) ? "is-invalid" : "")" 
+                                   @bind="order.CustomerName" 
+                                   placeholder="Ví dụ: Nguyễn Văn A" />
+                        </div>
+                        @if (isError && string.IsNullOrWhiteSpace(order.CustomerName))
+                        {
+                            <div class="text-danger small mt-1">Họ tên không được để trống.</div>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase">
+                            Địa chỉ giao hàng chi tiết <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-house-door"></i></span>
+                            <input type="text" 
+                                   class="form-control @(isError && string.IsNullOrWhiteSpace(order.CustomerAddress) ? "is-invalid" : "")" 
+                                   @bind="order.CustomerAddress" 
+                                   placeholder="Số nhà, tên toà nhà, ngõ/đường, phường/xã..." />
+                        </div>
+                        @if (isError && string.IsNullOrWhiteSpace(order.CustomerAddress))
+                        {
+                            <div class="text-danger small mt-1">Địa chỉ chi tiết không được để trống.</div>
+                        }
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-secondary small text-uppercase">Tỉnh / Thành phố</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-building"></i></span>
+                                <input type="text" class="form-control" @bind="order.CustomerCity" placeholder="Hà Nội, TP.HCM, Đà Nẵng..." />
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-secondary small text-uppercase">Quận / Huyện</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-signpost-2"></i></span>
+                                <input type="text" class="form-control" @bind="order.CustomerStateProvince" placeholder="Hải Châu, Cầu Giấy, Quận 1..." />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase">Quốc gia</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-globe-americas"></i></span>
+                            <input type="text" class="form-control" @bind="order.CustomerCountry" placeholder="Việt Nam" />
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Option -->
+                    <div class="mt-2 mb-4">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase mb-2">Phương thức thanh toán</label>
+                        <div class="p-3 border rounded-3 border-primary-subtle bg-primary-subtle bg-opacity-10 d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-check m-0">
+                                    <input class="form-check-input" type="radio" name="paymentOption" id="codPayment" checked />
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark d-flex align-items-center gap-2">
+                                        <i class="bi bi-cash-stack text-success fs-5"></i>
+                                        <span>Thanh toán khi nhận hàng (COD)</span>
+                                    </div>
+                                    <small class="text-muted">Nhận hàng kiểm tra và thanh toán tiền mặt cho shipper</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Phổ biến</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-2">
+                        <button class="btn btn-success btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" 
+                                @onclick="HandlePlaceOrder" 
+                                disabled="@isSubmitting">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span>Đang xử lý đơn hàng...</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-bag-check-fill fs-5"></i>
+                                <span>Xác Nhận & Đặt Hàng Ngay</span>
+                            }
+                        </button>
+                        
+                        <div class="text-center mt-3">
+                            <a href="/cart" class="text-muted small text-decoration-none d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-arrow-left"></i>
+                                <span>Quay lại chỉnh sửa giỏ hàng</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sticky Order Summary -->
+            <div class="col-lg-5">
+                <div class="position-sticky" style="top: 1.5rem;">
+                    <OrderSummaryComponent Order="order" HidePlaceOrderButton="true"></OrderSummaryComponent>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private Order? order;
+    private bool isError = false;
+    private bool isLoading = true;
+    private bool isSubmitting = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isLoading = true;
+            order = await viewShoppingCartUseCase.Execute();
+            
+            // Default country if null/empty
+            if (order != null && string.IsNullOrWhiteSpace(order.CustomerCountry))
+            {
+                order.CustomerCountry = "Việt Nam";
+            }
+
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandlePlaceOrder()
+    {
+        if (order == null || string.IsNullOrWhiteSpace(order.CustomerName) || string.IsNullOrWhiteSpace(order.CustomerAddress))
+        {
+            isError = true;
+            return;
+        }
+
+        isError = false;
+        isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            string? orderUniqueId = await placeOrderUseCase.Execute(order);
+            if (!string.IsNullOrEmpty(orderUniqueId))
+            {
+                navigationManager.NavigateTo($"/orderconfirm/{orderUniqueId}");
+            }
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

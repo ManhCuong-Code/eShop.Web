@@ -1,11 +1,14 @@
-<form class="d-flex align-items-center mb-3" @onsubmit="HandleSearch">
-    <div class="me-2">
-        <label for="filter" class="col-form-label">Search:</label>
+<form class="m-0" @onsubmit="HandleSearch">
+    <div class="input-group rounded-pill overflow-hidden bg-white border shadow-sm" style="min-width: 280px; max-width: 420px;">
+        <span class="input-group-text bg-white border-0 ps-3 text-muted">
+            <i class="bi bi-search"></i>
+        </span>
+        <input type="text" class="form-control border-0 shadow-none ps-2" id="filter" 
+               @bind="filter" placeholder="Tìm sản phẩm, thương hiệu..." />
+        <button type="button" class="btn btn-primary px-3 fw-semibold" style="border-radius: 0 50rem 50rem 0 !important;" @onclick="HandleSearch">
+            Tìm
+        </button>
     </div>
-    <div class="me-2">
-        <input type="text" class="form-control" id="filter" @bind="filter" placeholder="Type to search..." />
-    </div>
-    <button type="button" class="btn btn-primary" @onclick="HandleSearch">Search</button>
 </form>
 
 @code {

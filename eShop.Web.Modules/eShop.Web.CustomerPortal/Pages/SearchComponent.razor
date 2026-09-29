@@ -6,27 +6,54 @@
 
 @inject ISearchProductUseCase searchProduct
 
-<h3>Search Product Component</h3>
+<PageTitle>Danh Sách Sản Phẩm - eShop</PageTitle>
 
-<br />
-<SearchBarComponent OnSearch="HandleSearch"></SearchBarComponent>
-<br/>
+<div class="container my-3">
+    <!-- Banner -->
+    <div class="p-4 p-md-5 mb-4 rounded-4 text-white shadow-sm" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+        <div class="col-lg-8 px-0">
+            <span class="badge bg-primary px-3 py-1 rounded-pill mb-2">Mua sắm tiện lợi & an tâm</span>
+            <h1 class="display-6 fw-bold">Khám Phá Các Sản Phẩm Công Nghệ</h1>
+            <p class="lead my-2 text-white-50 fs-6">Sản phẩm chính hãng 100%, bảo hành uy tín, giao hàng nhanh chóng toàn quốc.</p>
+        </div>
+    </div>
 
-@if (products != null && products.Any())
-{
-    <div class="d-flex flex-wrap">
-        @foreach (var product in products)
-        {
-            <ProductCardComponent product="product"></ProductCardComponent>
-        }
+    <!-- Search Bar & Title Header -->
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+        <div>
+            <h4 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-grid-fill text-primary me-2"></i>Tất Cả Sản Phẩm
+            </h4>
+            <small class="text-muted">Chọn sản phẩm bạn quan tâm để xem chi tiết và thêm vào giỏ hàng</small>
+        </div>
+        <div>
+            <SearchBarComponent OnSearch="HandleSearch"></SearchBarComponent>
+        </div>
     </div>
-}
-else
-{
-    <div class="alert alert-light border text-muted">
-        <em>Cannot find products.</em>
-    </div>
-}
+
+    @if (products != null && products.Any())
+    {
+        <div class="d-flex flex-wrap justify-content-start gap-2">
+            @foreach (var product in products)
+            {
+                <ProductCardComponent product="product"></ProductCardComponent>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4">
+            <i class="bi bi-search text-muted fs-1 mb-2"></i>
+            <h5 class="fw-bold text-dark">Không tìm thấy sản phẩm phù hợp</h5>
+            <p class="text-muted">Hãy thử tìm kiếm với từ khoá khác hoặc xem tất cả danh mục.</p>
+            <div>
+                <button class="btn btn-outline-primary btn-sm rounded-pill px-4" @onclick="() => HandleSearch(string.Empty)">
+                    Xem Tất Cả Sản Phẩm
+                </button>
+            </div>
+        </div>
+    }
+</div>
 
 
 @code {

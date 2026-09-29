@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,10 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\eShop.CoreBusiness\eShop.CoreBusiness.csproj" />
     <ProjectReference Include="..\eShop.UseCases\eShop.UseCases.csproj" />
     <ProjectReference Include="..\eShop.Web.Modules\eShop.Web.CustomerPortal\eShop.Web.CustomerPortal.csproj" />
+    <ProjectReference Include="..\eShop.Web.Modules\eShop.Web.AdminPortal\eShop.Web.AdminPortal.csproj" />
     <ProjectReference Include="..\Plugins\eShop.DataStore.HandCoded\eShop.DataStore.HandCoded.csproj" />
+    <ProjectReference Include="..\Plugins\eShop.DataStore.SQL.Dapper\eShop.DataStore.SQL.Dapper.csproj" />
     <ProjectReference Include="..\Plugins\eShop.ShoppingCart.LocalStorage\eShop.ShoppingCart.LocalStorage.csproj" />
+    <ProjectReference Include="..\Plugins\eShop.StateStore.DI\eShop.StateStore.DI.csproj" />
   </ItemGroup>
 
 </Project>

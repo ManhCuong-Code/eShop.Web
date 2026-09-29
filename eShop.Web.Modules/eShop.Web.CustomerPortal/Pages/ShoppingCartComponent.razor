@@ -5,38 +5,74 @@
 
 @inject IViewShoppingCartUseCase viewShoppingCartUseCase
 
-<h3>Shopping Cart</h3>
-<br />
+<PageTitle>Giỏ Hàng - eShop</PageTitle>
 
-@if (order != null && order.LineItems != null && order.LineItems.Count > 0)
-{
-    <div class="row">
-        <div class="col-6">
-            <ul>
-                @for (int i = 0; i < order.LineItems.Count; i++)
-                {
-                    <LineItemComponent LineItem="order.LineItems[i]"></LineItemComponent>
+<div class="container my-4">
+    <!-- Stepper Navigation -->
+    <div class="checkout-steps">
+        <div class="step-item active">
+            <span class="step-num">1</span>
+            <span>1. Giỏ hàng</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <span class="step-num">2</span>
+            <span>2. Thông tin giao hàng</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item">
+            <span class="step-num">3</span>
+            <span>3. Hoàn tất</span>
+        </div>
+    </div>
 
-                    @if (i < order.LineItems.Count - 1)
+    @if (order != null && order.LineItems != null && order.LineItems.Count > 0)
+    {
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-cart3 text-primary me-2"></i>Sản Phẩm Trong Giỏ (@order.LineItemCount)
+                    </h5>
+                    <a href="/products" class="text-muted small text-decoration-none d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Thêm sản phẩm khác</span>
+                    </a>
+                </div>
+
+                <ul class="list-unstyled mb-0">
+                    @for (int i = 0; i < order.LineItems.Count; i++)
                     {
-                        <li style="list-style:none">
-                            <hr />
-                        </li>
+                        <LineItemComponent LineItem="order.LineItems[i]"
+                                           OnDeleteProduct="HandleDeleteProduct"
+                                           OnUpdateQuantity="HandleUpdateQuantity">
+                        </LineItemComponent>
                     }
-                }
-            </ul>
+                </ul>
+            </div>
+            <div class="col-lg-5">
+                <div class="position-sticky" style="top: 1.5rem;">
+                    <OrderSummaryComponent Order="order"></OrderSummaryComponent>
+                </div>
+            </div>
         </div>
-        <div class="col">
-            @*order summary*@
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4 mx-auto" style="max-width: 520px;">
+            <div class="mb-3">
+                <i class="bi bi-cart-x text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">Giỏ hàng của bạn đang trống</h4>
+            <p class="text-muted mb-4">Bạn chưa chọn sản phẩm nào vào giỏ hàng. Hãy khám phá và mua sắm ngay nhé!</p>
+            <div>
+                <a href="/products" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">
+                    <i class="bi bi-arrow-left me-2"></i>Khám Phá Sản Phẩm Ngay
+                </a>
+            </div>
         </div>
-    </div>
-}
-else
-{
-    <div class="alert alert-light border text-muted">
-        Your cart is empty.
-    </div>
-}
+    }
+</div>
 
 @code {
     private Order? order;
@@ -49,5 +85,15 @@ else
             order = await viewShoppingCartUseCase.Execute();
             StateHasChanged();
         }
+    }
+
+    private void HandleDeleteProduct(Order order)
+    {
+        this.order = order;
+    }
+
+    private void HandleUpdateQuantity(Order order)
+    {
+        this.order = order;
     }
 }

@@ -1,14 +1,18 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 <PageTitle>eShop.Web</PageTitle>
-<main>
+<main class="d-flex flex-column min-vh-100">
     <TopNavbar></TopNavbar>
-    <div class="top-row px-4">
-        <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-    </div>
 
-    <article class="content px-4">
+    <article class="content px-3 px-md-4 py-4 flex-grow-1">
         @Body
     </article>
+
+    <footer class="bg-white border-top py-4 mt-auto text-center text-muted small">
+        <div class="container">
+            <p class="mb-1 fw-semibold text-dark">eShop - Hệ Thống Bán Lẻ & Mua Sắm Trực Tuyến</p>
+            <p class="mb-0 text-secondary">&copy; @DateTime.Now.Year eShop. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </footer>
 </main>
 
 

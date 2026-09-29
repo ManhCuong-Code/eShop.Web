@@ -1,0 +1,65 @@
+﻿@page "/login"
+
+<PageTitle>Đăng Nhập Quản Trị - eShop</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-shield-lock me-2"></i>Đăng Nhập Quản Trị</h4>
+                    <p class="small mb-0 text-white-50 mt-1">Dành riêng cho Quản trị viên eShop Admin Portal</p>
+                </div>
+                <div class="card-body p-4">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>@errorMessage
+                        </div>
+                    }
+
+                    <!-- Lưu ý: Dùng HTML FORM POST truyền thống để kích hoạt Minimal API Endpoint /authenticate -->
+                    <form method="post" action="/authenticate">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên Đăng Nhập:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                <input type="text" name="username" class="form-control" placeholder="Tài khoản mặc định: admin" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Mật Khẩu:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+                                <input type="password" name="password" class="form-control" placeholder="Mật khẩu: 123456" required />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Đăng Nhập
+                        </button>
+                    </form>
+                </div>
+                <div class="card-footer bg-light text-center py-3 text-muted small">
+                    Tài khoản test: <code>admin</code> / Mật khẩu: <code>123456</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? error { get; set; }
+
+    private string? errorMessage;
+
+    protected override void OnParametersSet()
+    {
+        if (error == "invalid")
+        {
+            errorMessage = "Tên đăng nhập hoặc mật khẩu không chính xác! Vui lòng thử lại.";
+        }
+    }
+}

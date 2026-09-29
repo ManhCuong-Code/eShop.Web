@@ -6,9 +6,13 @@
   </Folder>
   <Folder Name="/Plugins/">
     <Project Path="Plugins/eShop.DataStore.HandCoded/eShop.DataStore.HandCoded.csproj" />
+    <Project Path="Plugins/eShop.DataStore.SQL.Dapper/eShop.DataStore.SQL.Dapper.csproj" />
     <Project Path="Plugins/eShop.ShoppingCart.LocalStorage/eShop.ShoppingCart.LocalStorage.csproj" Id="b6f90c05-a01e-4409-a0ea-1772e9ddd36d" />
+    <Project Path="Plugins/eShop.StateStore.DI/eShop.StateStore.DI.csproj" Id="38650a86-c055-469e-80db-3d06847a06cb" />
   </Folder>
   <Project Path="eShop.CoreBusiness/eShop.CoreBusiness.csproj" />
   <Project Path="eShop.UseCases/eShop.UseCases.csproj" />
-  <Project Path="eShop.Web/eShop.Web.csproj" />
+  <Project Path="eShop.Web/eShop.Web.csproj">
+    <BuildDependency Project="eShop.Web.Modules/eShop.Web.Common/eShop.Web.Common.csproj" />
+  </Project>
 </Solution>

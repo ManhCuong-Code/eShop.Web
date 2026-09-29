@@ -1,9 +1,27 @@
-<Router AppAssembly="typeof(Program).Assembly"
+﻿<Router AppAssembly="typeof(Program).Assembly"
         AdditionalAssemblies="new[]
                                 {
-                                    typeof(eShop.Web.CustomerPortal.Pages.ViewProductComponent).Assembly}">
+                                    typeof(eShop.Web.CustomerPortal.Pages.ViewProductComponent).Assembly,
+                                    typeof(eShop.Web.AdminPortal.Controls.OutstandingOrdersComponent).Assembly
+                                }">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                <div class="container p-5 text-center">
+                    <div class="alert alert-danger shadow-sm">
+                        <h4 class="alert-heading"><i class="bi bi-shield-lock-fill me-2"></i>Truy Cập Bị Từ Chối!</h4>
+                        <p>Bạn không có quyền truy cập vào khu vực này hoặc phiên đăng nhập đã hết hạn.</p>
+                        <hr />
+                        <a href="login" class="btn btn-primary fw-bold px-4">Đăng Nhập Ngay</a>
+                    </div>
+                </div>
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(Layout.MainLayout)">
+            <p role="alert">Trang bạn tìm kiếm không tồn tại.</p>
+        </LayoutView>
+    </NotFound>
 </Router>

@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace eShop.CoreBusiness.Models
 {
@@ -10,10 +10,11 @@ namespace eShop.CoreBusiness.Models
         {
             LineItems = new List<OrderLineItem>();
         }
-        public  int?  OrderID { get; set; }
+        public int? OrderID { get; set; }
+        public int? OrderId { get => OrderID; set => OrderID = value; }
         public DateTime? DatePlaced { get; set; }
         public DateTime? DateProcessed { get; set; }
-        public DateTime? DateProcessing{ get; set; }
+        public DateTime? DateProcessing { get; set; }
         public string? CustomerName { get; set; }
         public string? CustomerAddress { get; set; }
         public string? CustomerCity { get; set; }
@@ -22,6 +23,9 @@ namespace eShop.CoreBusiness.Models
         public string? AdminUser { get; set; }
         public List<OrderLineItem> LineItems { get; set; }
         public string? UniqueId { get; set; }
+
+        public int LineItemCount => LineItems?.Sum(x => x.Quantity) ?? 0;
+        public double TotalPrice => LineItems?.Sum(x => x.Price * x.Quantity) ?? 0;
 
         public void AddProduct(int productId, int qty, double price)
         {
